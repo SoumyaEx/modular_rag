@@ -15,19 +15,24 @@ import java.util.stream.Collectors;
 @Service
 public class AskService {
     private final OpenSearchClient client;
+
+    private final TransformQuery transformQuery;
     private final GeminiClient geminiClient;
     private static final String INDEX_NAME = "document";
 
-    public AskService(OpenSearchClient client, GeminiClient geminiClient) {
+    public AskService(OpenSearchClient client, TransformQuery transformQuery, GeminiClient geminiClient) {
         this.client = client;
+        this.transformQuery = transformQuery;
         this.geminiClient = geminiClient;
     }
 
 
     public String generateResponse(String query) throws IOException {
+        String transformQry = transformQuery.transformQuery(query);
+
         SearchRequest searchRequest = new SearchRequest.Builder()
                 .index(INDEX_NAME)
-                .query(q -> q.match(m -> m.field("content").query(FieldValue.of(query))))
+                .query(q -> q.match(m -> m.field("content").query(FieldValue.of(transformQry))))
                 .build();
 
         SearchResponse<Object> response = client.search(searchRequest, Object.class);

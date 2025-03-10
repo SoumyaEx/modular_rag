@@ -32,6 +32,8 @@ public class OpenSearchService {
     private final GeminiClient geminiClient;
 
     private static final String INDEX_NAME = "document";
+    @Value("${spring.ai.openai.api-key}")
+    private String openaiApiKey;
 
     public OpenSearchService(OpenSearchClient client, ChatClient.Builder chatClientBuilder, GeminiClient geminiClient) {
         this.client = client;
